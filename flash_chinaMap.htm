@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>基于FLASH的中国地图</title>
+    <script type="text/javascript" src="js/swfobject.js" />
+    <script type="text/javascript">
+        function eventHandler(e) {
+            alert(e.value);
+        }
+    </script>
+   
+</head>
+<body>
+    <div id="container" style="margin-left: 45px; padding-top: 10px; padding-left: 10px;
+        background: white; width: 650px; height: 530px;">
+    </div>
+     <script type="text/javascript">
+         //var url = "AjaxHandler.ashx?flag=flashXML";  此处可调用后台动态生成如data/d.xml的数据文件
+         var s1 = new SWFObject("ChinaMap.swf", "ply", "750", "520", "10", "#ffffff");
+         s1.addParam("allowfullscreen", "true");
+         s1.addParam("allownetworking", "all");
+         s1.addParam("allowscriptaccess", "always");
+         s1.addParam("wmode", "transparent");
+         s1.addVariable("title", "FLASH_CHINAMAP");
+         //s1.addVariable("xmlurl", url);
+         s1.addVariable("xmlurl", "data/d.xml");
+         s1.addVariable("jsHandler", "eventHandler");
+         s1.write("container");
+    </script>
+</body>
+</html>

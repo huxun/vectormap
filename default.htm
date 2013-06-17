@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>jVectorMap</title>
+    <link href="css/style.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="css/highlight.css" media="screen" rel="stylesheet" type="text/css" />
+    <link href="css/jquery.vector-map.css" media="screen" rel="stylesheet" type="text/css" />
+    <script src="js/jquery-1.6.min.js" type="text/javascript"></script>
+    <script src="js/jquery.vector-map.js" type="text/javascript"></script>
+    <script src="js/world-en.js" type="text/javascript"></script>
+    <script src="js/usa-en.js" type="text/javascript"></script>
+    <script src="js/germany-en.js" type="text/javascript"></script>
+    <script src="js/europe-en.js" type="text/javascript"></script>
+    <script src="js/gdp-data.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function(){
+            //example 1
+            $('#example-map-1').vectorMap();
+            
+            //example 2
+            var max = 0,
+                min = Number.MAX_VALUE,
+                cc,
+                startColor = [200, 238, 255],
+                endColor = [0, 100, 145],
+                colors = {},
+                hex;
+            for (cc in gdpData) {
+                if (parseFloat(gdpData[cc]) > max) {
+                    max = parseFloat(gdpData[cc]);
+                }
+                if (gdpData[cc] < min) {
+                    min = parseFloat(gdpData[cc]);
+                }
+            }
+            for (cc in gdpData) {
+                if (gdpData[cc] > 0) {
+                    colors[cc] = '#';
+                    for (var i = 0; i<3; i++) {
+                        hex = Math.round(startColor[i] + (endColor[i] - startColor[i])*(gdpData[cc] / (max - min))).toString(16);
+                        if (hex.length == 1) {
+                            hex = '0'+hex;
+                        }
+                        colors[cc] += (hex.length == 1 ? '0' : '') + hex;
+                    }
+                }
+            }
+            $('#example-map-2').vectorMap({
+                colors: colors,
+                hoverOpacity: 0.7,
+                hoverColor: false
+            });
+            
+            //example 3
+            $('#example-map-3').vectorMap({
+                values: gdpData,
+                scaleColors: ['#C8EEFF', '#006491'],
+                normalizeFunction: 'polynomial',
+                hoverOpacity: 0.7,
+                hoverColor: false
+            });
+            
+            //avaliable maps
+            $('#avaliable-maps-usa').vectorMap({map: 'usa_en'});
+            $('#avaliable-maps-germany').vectorMap({map: 'germany_en'});
+            $('#avaliable-maps-europe').vectorMap({map: 'europe_en'}); 
+        });
+    </script>
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-20607161-4']);
+        _gaq.push(['_trackPageview']);
+      
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+<body>
+    <div id="menu">
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#reference">Reference</a></li>
+            <li><a href="#maps">Maps</a></li>
+            <li><a href="#data_visualization_with_jvectormap">Data visualization</a>
+            <li><a href="#download">Download</a></li>
+            <li><a href="#contacts">Contacts</a></li>
+        </ul>
+    </div>
+    <div id="content">
+        <h2 id="overview">Overview</h2><p>jVectorMap is a jQuery plugin employed to show vector maps and visualize data on HTML
+pages. It uses SVG in all modern browsers like Firefox 3 or 4, Safari, Chrome,
+Opera, IE9, while legacy support for older versions of IE from 6 to 8 is
+provided with VML. Using jVectorMap is pretty simple as for any other jQuery
+plugin. All you need is to connect JavaScript and CSS files of the plugin:</p><pre class="code"><code><span class="kwa">&lt;link href=</span><span class="str">&quot;jquery.vector-map.css&quot;</span><span class="kwa"> media=</span><span class="str">&quot;screen&quot;</span><span class="kwa"> rel=</span><span class="str">&quot;stylesheet&quot;</span><span class="kwa"> type=</span><span class="str">&quot;text/css&quot;</span><span class="kwa"> /&gt;</span>
+<span class="kwa">&lt;script src=</span><span class="str">&quot;jquery.vector-map.js&quot;</span><span class="kwa"> type=</span><span class="str">&quot;text/javascript&quot;</span><span class="kwa">&gt;</span><span class="kwa">&lt;/script&gt;</span>
+<span class="kwa">&lt;script src=</span><span class="str">&quot;world-en.js&quot;</span><span class="kwa"> type=</span><span class="str">&quot;text/javascript&quot;</span><span class="kwa">&gt;</span><span class="kwa">&lt;/script&gt;</span>
+</code></pre><p>And then initialize it using some element as a container:</p><pre class="code"><code>$<span class="sym">(</span><span class="kwa">function</span><span class="sym">(){</span>
+    $<span class="sym">(</span><span class="str">'#map'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">();</span>
+<span class="sym">});</span>
+</code></pre><p>So you can get something like this:
+<div id="example-map-1"></div></p><p>Now you can provide various parameters to the initialization function to
+customize look and behavior of the map. You can find description of all
+available parameters in the reference.</p><h2 id="reference">Reference</h2><h3 id="parameters">Parameters</h3><p>While initializing map you can provide parameters to change its look and feel.</p><dl><dt>color <span>#ffffff</span></dt><dd>Color of map regions. </dd><dt>hoverColor <span>black</span></dt><dd>Color of the region when mouse pointer is over it. </dd><dt>hoverOpacity <span> </span></dt><dd>Opacity of the region when mouse pointer is over it. </dd><dt>backgroundColor <span>#505050</span></dt><dd>Background color of map container in any CSS compatible format. </dd><dt>colors <span> </span></dt><dd>Colors of individual map regions. Keys of the <code>colors</code> objects are country codes according to <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2"> ISO 3166-1 alpha-2</a> standard. Keys of <code>colors</code> must be in lower case. </dd></dl><dl><dt>scaleColors <span>['#b6d6ff', '#005ace']</span></dt><dd>This option defines colors, with which regions will be painted when you set option <code>values</code>. Array <code>scaleColors</code> can have more then two elements. Elements should be strings representing colors in RGB hex format. </dd><dt>normalizeFunction <span>'linear'</span></dt><dd>This function can be used to improve results of visualizations for data with non-linear nature. Function gets raw value as the first parameter and should return value which will be used in calculations of color, with which particular region will be painted. </dd><dt>onLabelShow <span> </span></dt><dd>Callback function which will be called before label is shown. Label DOM object and country code will be passed to the callback as arguments. </dd><dt>onRegionOver <span> </span></dt><dd>Callback function which will be called when the mouse cursor enters the region path. Country code will be passed to the callback as argument. </dd><dt>onRegionOut <span> </span></dt><dd>Callback function which will be called when the mouse cursor leaves the region path. Country code will be passed to the callback as argument. </dd><dt>onRegionClick <span> </span></dt><dd>Callback function which will be called when the user clicks the region path. Country code will be passed to the callback as argument. </dd></dl><h3 id="dynamic_changing_of_the_options">Dynamic changing of the options</h1><p>Most of the options can be changed after initialization using the following code:</p><pre class="code"><code>$<span class="sym">(</span><span class="str">'#map'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">(</span><span class="str">'set'</span><span class="sym">,</span> <span class="str">'colors'</span><span class="sym">, {</span>us<span class="sym">:</span> <span class="str">'#0000ff'</span><span class="sym">});</span>
+</code></pre><p>Instead of <code>colors</code> can be used any parameter except callbacks.
+Callbacks can be added and deleted using standard jQuery patterns of working
+with events.</p><h3 id="events">Events</h3><p>You can define callback function when you initialize jVectorMap:</p><pre class="code"><code>$<span class="sym">(</span><span class="str">'#map-events'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">({</span>
+    onLabelShow<span class="sym">:</span> <span class="kwa">function</span><span class="sym">(</span><span class="kwc">event</span><span class="sym">,</span> label<span class="sym">,</span> code<span class="sym">){},</span>
+    onRegionOver<span class="sym">:</span> <span class="kwa">function</span><span class="sym">(</span><span class="kwc">event</span><span class="sym">,</span> code<span class="sym">){},</span>
+    onRegionOut<span class="sym">:</span> <span class="kwa">function</span><span class="sym">(</span><span class="kwc">event</span><span class="sym">,</span> code<span class="sym">){},</span>
+    onRegionClick<span class="sym">:</span> <span class="kwa">function</span><span class="sym">(</span><span class="kwc">event</span><span class="sym">,</span> code<span class="sym">){}</span>
+<span class="sym">});</span>
+</code></pre><p>Or later using standard jQuery mechanism:</p><pre class="code"><code>$<span class="sym">(</span><span class="str">'#map-events'</span><span class="sym">).</span><span class="kwd">bind</span><span class="sym">(</span><span class="str">'labelShow.jvectormap'</span><span class="sym">,</span> <span class="kwa">function</span><span class="sym">(</span><span class="kwc">event</span><span class="sym">,</span> label<span class="sym">,</span> code<span class="sym">){})</span>
+$<span class="sym">(</span><span class="str">'#map-events'</span><span class="sym">).</span><span class="kwd">bind</span><span class="sym">(</span><span class="str">'regionMouseOver.jvectormap'</span><span class="sym">,</span> <span class="kwa">function</span><span class="sym">(){</span><span class="kwc">event</span><span class="sym">,</span> code<span class="sym">})</span>
+$<span class="sym">(</span><span class="str">'#map-events'</span><span class="sym">).</span><span class="kwd">bind</span><span class="sym">(</span><span class="str">'regionMouseOut.jvectormap'</span><span class="sym">,</span> <span class="kwa">function</span><span class="sym">(){</span><span class="kwc">event</span><span class="sym">,</span> code<span class="sym">})</span>
+$<span class="sym">(</span><span class="str">'#map-events'</span><span class="sym">).</span><span class="kwd">bind</span><span class="sym">(</span><span class="str">'regionClick.jvectormap'</span><span class="sym">,</span> <span class="kwa">function</span><span class="sym">(){</span><span class="kwc">event</span><span class="sym">,</span> code<span class="sym">})</span>
+</code></pre><p>Consider that fact that you can use standart features of jQuery events like
+<code>event.preventDefault()</code> or returning false from the callback to
+prevent default behavior of jVectorMap (showing label or changing country color
+on hover). In the following example, when user moves mouse cursor over Canada
+label won't be shown and color of country won't be changed. At the same label
+for Russia will have custom text.</p><pre class="code"><code>$<span class="sym">(</span><span class="str">'#map-events'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">({</span>
+    onLabelShow<span class="sym">:</span> <span class="kwa">function</span><span class="sym">(</span><span class="kwc">event</span><span class="sym">,</span> label<span class="sym">,</span> code<span class="sym">){</span>
+        <span class="kwa">if</span> <span class="sym">(</span>code <span class="sym">==</span> <span class="str">'ca'</span><span class="sym">) {</span>
+            <span class="kwc">event</span><span class="sym">.</span><span class="kwd">preventDefault</span><span class="sym">();</span>
+        <span class="sym">}</span> <span class="kwa">else if</span> <span class="sym">(</span>code <span class="sym">==</span> <span class="str">'ru'</span><span class="sym">) {</span>
+            label<span class="sym">.</span><span class="kwc">text</span><span class="sym">(</span><span class="str">'Bears, vodka, balalaika'</span><span class="sym">);</span>
+        <span class="sym">}</span>
+    <span class="sym">},</span>
+    onRegionOver<span class="sym">:</span> <span class="kwa">function</span><span class="sym">(</span><span class="kwc">event</span><span class="sym">,</span> code<span class="sym">){</span>
+        <span class="kwa">if</span> <span class="sym">(</span>code <span class="sym">==</span> <span class="str">'ca'</span><span class="sym">) {</span>
+            <span class="kwc">event</span><span class="sym">.</span><span class="kwd">preventDefault</span><span class="sym">();</span>
+        <span class="sym">}</span>
+    <span class="sym">},</span>
+<span class="sym">});</span>
+</code></pre><h2 id="data_visualization_with_jvectormap">Data visualization with jVectorMap</h1><p>Here I want to demonstrate how visualization of some geographical-related
+data can be done using jVectorMap. Let's visualize information about GDP
+in 2010 for every country. At first we need some data. Let it be <a href="http://www.imf.org/external/pubs/ft/weo/2011/01/weodata/index.aspx">
+site</a> of International Monetary Fond. There we can get information in xsl format,
+which can be converted first to csv and then to json with any scripting language.
+Now we have file <code>gdp-data.js</code> with such content (globals are evil,
+I know, but just for the sake of simplification):</p><pre class="code"><code><span class="kwa">var</span> gdpData <span class="sym">= {</span><span class="str">&quot;af&quot;</span><span class="sym">:</span><span class="num">16.63</span><span class="sym">,</span><span class="str">&quot;al&quot;</span><span class="sym">:</span><span class="num">11.58</span><span class="sym">,</span><span class="str">&quot;dz&quot;</span><span class="sym">:</span><span class="num">158.97</span><span class="sym">,...}</span>
+</code></pre><p>Then connect it to the page and add some code to make visualization:</p><pre class="code"><code><span class="kwa">var</span> <span class="kwc">max</span> <span class="sym">=</span> <span class="num">0</span><span class="sym">,</span>
+    <span class="kwc">min</span> <span class="sym">=</span> <span class="kwc">Number</span><span class="sym">.</span>MAX_VALUE<span class="sym">,</span>
+    cc<span class="sym">,</span>
+    startColor <span class="sym">= [</span><span class="num">200</span><span class="sym">,</span> <span class="num">238</span><span class="sym">,</span> <span class="num">255</span><span class="sym">],</span>
+    endColor <span class="sym">= [</span><span class="num">0</span><span class="sym">,</span> <span class="num">100</span><span class="sym">,</span> <span class="num">145</span><span class="sym">],</span>
+    colors <span class="sym">= {},</span>
+    hex<span class="sym">;</span>
+<span class="slc">//find maximum and minimum values</span>
+<span class="kwa">for</span> <span class="sym">(</span>cc <span class="kwa">in</span> gdpData<span class="sym">) {</span>
+    <span class="kwa">if</span> <span class="sym">(</span><span class="kwd">parseFloat</span><span class="sym">(</span>gdpData<span class="sym">[</span>cc<span class="sym">]) &gt;</span> <span class="kwc">max</span><span class="sym">) {</span>
+        <span class="kwc">max</span> <span class="sym">=</span> <span class="kwd">parseFloat</span><span class="sym">(</span>gdpData<span class="sym">[</span>cc<span class="sym">]);</span>
+    <span class="sym">}</span>
+    <span class="kwa">if</span> <span class="sym">(</span><span class="kwd">parseFloat</span><span class="sym">(</span>gdpData<span class="sym">[</span>cc<span class="sym">]) &lt;</span> <span class="kwc">min</span><span class="sym">) {</span>
+        <span class="kwc">min</span> <span class="sym">=</span> <span class="kwd">parseFloat</span><span class="sym">(</span>gdpData<span class="sym">[</span>cc<span class="sym">]);</span>
+    <span class="sym">}</span>
+<span class="sym">}</span>
+<span class="slc">//set colors according to values of GDP</span>
+<span class="kwa">for</span> <span class="sym">(</span>cc <span class="kwa">in</span> gdpData<span class="sym">) {</span>
+    <span class="kwa">if</span> <span class="sym">(</span>gdpData<span class="sym">[</span>cc<span class="sym">] &gt;</span> <span class="num">0</span><span class="sym">) {</span>
+        colors<span class="sym">[</span>cc<span class="sym">] =</span> <span class="str">'#'</span><span class="sym">;</span>
+        <span class="kwa">for</span> <span class="sym">(</span><span class="kwa">var</span> i <span class="sym">=</span> <span class="num">0</span><span class="sym">;</span> i<span class="sym">&lt;</span><span class="num">3</span><span class="sym">;</span> i<span class="sym">++) {</span>
+            hex <span class="sym">=</span> <span class="kwc">Math</span><span class="sym">.</span><span class="kwc">round</span><span class="sym">(</span>startColor<span class="sym">[</span>i<span class="sym">] + (</span>endColor<span class="sym">[</span>i<span class="sym">] -</span> startColor<span class="sym">[</span>i<span class="sym">])*(</span>gdpData<span class="sym">[</span>cc<span class="sym">] / (</span><span class="kwc">max</span> <span class="sym">-</span> <span class="kwc">min</span><span class="sym">))).</span><span class="kwc">toString</span><span class="sym">(</span><span class="num">16</span><span class="sym">);</span>
+            <span class="kwa">if</span> <span class="sym">(</span>hex<span class="sym">.</span><span class="kwc">length</span> <span class="sym">==</span> <span class="num">1</span><span class="sym">) {</span>
+                hex <span class="sym">=</span> <span class="str">'0'</span><span class="sym">+</span>hex<span class="sym">;</span>
+            <span class="sym">}</span>
+            colors<span class="sym">[</span>cc<span class="sym">] += (</span>hex<span class="sym">.</span><span class="kwc">length</span> <span class="sym">==</span> <span class="num">1</span> ? <span class="str">'0'</span> <span class="sym">:</span> <span class="str">''</span><span class="sym">) +</span> hex<span class="sym">;</span>
+        <span class="sym">}</span>
+    <span class="sym">}</span>
+<span class="sym">}</span>
+<span class="slc">//initialize jVectorMap</span>
+$<span class="sym">(</span><span class="str">'#example-map-2'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">({</span>
+    colors<span class="sym">:</span> colors<span class="sym">,</span>
+    hoverOpacity<span class="sym">:</span> <span class="num">0.7</span><span class="sym">,</span>
+    hoverColor<span class="sym">:</span> <span class="kwa">false</span>
+<span class="sym">});</span>
+</code></pre><p>Here is the result:</p><p><div id="example-map-2"></div></p><p>Not really hard I think. But we have two problems. At first it's necessary to
+write some code and also we got not really helpful visualization, because most
+of countries hove about the same color. This happens because linear
+function was used to convert values to colors, but data rarely has linear nature.
+So we need to use some non-linear scale to visualize data. Fortunately jVectorMap
+has functionality to resolve both these problems by simply providing additional
+parameters to initialization function.</p><pre class="code"><code>$<span class="sym">(</span><span class="str">'#example-map-3'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">({</span>
+    values<span class="sym">:</span> gdpData<span class="sym">,</span>
+    scaleColors<span class="sym">: [</span><span class="str">'#C8EEFF'</span><span class="sym">,</span> <span class="str">'#006491'</span><span class="sym">],</span>
+    normalizeFunction<span class="sym">:</span> <span class="str">'polynomial'</span><span class="sym">,</span>
+    hoverOpacity<span class="sym">:</span> <span class="num">0.7</span><span class="sym">,</span>
+    hoverColor<span class="sym">:</span> <span class="kwa">false</span>
+<span class="sym">});</span>
+</code></pre><p><div id="example-map-3"></div></p><p>Looks much more informative now!</p><h2 id="maps">Maps</h2><p>Two additional vector maps are available: USA and Germany. They are included in standard
+package.</p><pre class="code"><code>$<span class="sym">(</span><span class="str">'#map-usa'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">({</span>map<span class="sym">:</span> <span class="str">'usa_en'</span><span class="sym">});</span>
+</code></pre><p><div id="avaliable-maps-usa"></div></p><pre class="code"><code>$<span class="sym">(</span><span class="str">'#map-germany'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">({</span>map<span class="sym">:</span> <span class="str">'germany_en'</span><span class="sym">});</span>
+</code></pre><p><div id="avaliable-maps-germany"></div></p><pre class="code"><code>$<span class="sym">(</span><span class="str">'#map-usa'</span><span class="sym">).</span><span class="kwd">vectorMap</span><span class="sym">({</span>map<span class="sym">:</span> <span class="str">'europe_en'</span><span class="sym">});</span>
+</code></pre><p><div id="avaliable-maps-europe"></div></p><h2 id="download">Download</h2><p>You can download jVectorMap <a href="jquery.vector-map.zip">here</a>.</p><h2 id="contacts">Contacts</h2><p>If you have any questions about library or need any help, don't hesitate to
+email me at <a href="mailto:echo.bjornd@gmail.com">echo.bjornd@gmail.com</a>.
+Any suggestions and feature requests are welcome too.</p><p>Also <a href="https://twitter.com/bjorn___d">follow me</a> on twitter.</p><p></p>
+    </div>
+</body>
+</html>
